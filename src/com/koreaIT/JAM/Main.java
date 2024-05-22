@@ -135,6 +135,61 @@ public class Main {
 				for (Article article : articles) {
 					System.out.printf("%d	|	%s\n", article.id, article.title);
 				}
+			} else if (cmd.startsWith("article modify ")) {
+				
+				int articleId = 0;
+				
+				try {
+					articleId = Integer.parseInt(cmd.split(" ")[2]); 
+				} catch (NumberFormatException e) {
+					System.out.println("명령어가 올바르지 않습니다.");
+					continue;
+				}
+				
+				System.out.println("== 게시물 수정 ==");
+				
+				System.out.printf("수정 할 제목 : ");
+				String title = sc.nextLine();
+				System.out.printf("수정 할 내용 : ");
+				String body = sc.nextLine();
+				
+				
+				try {
+		            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+		            
+		            String sql = "UPDATE article";
+		            sql += " SET updateDate = NOW()";
+		            sql += ", title = '" + title + "'";
+		            sql += ", `body` =  '" + body + "'";
+		            sql += " where id =  " + articleId + ";";
+		            
+		            pstmt = connection.prepareStatement(sql);
+		            pstmt.executeUpdate();
+
+		        } catch (SQLException e) {
+		            e.printStackTrace();
+		        } finally {
+		            if (pstmt != null) {
+		                try {
+		                	pstmt.close();
+		                } catch (SQLException e) {
+		                    e.printStackTrace();
+		                }
+		            }
+		            if (connection != null) {
+		            	try {
+		            		connection.close();
+		            	} catch (SQLException e) {
+		            		e.printStackTrace();
+		            	}
+		            }
+		        }
+				
+				System.out.printf("%d번 게시물이 수정되었습니다.\n", articleId);
+				
+			} else {
+				System.out.println("존재하지 않는 명령어 입니다.");
+				continue;
 			}
 			
 			if (cmd.equals("exit")) {
