@@ -54,7 +54,6 @@ public class App {
 			        } catch (SQLException e) {
 			            e.printStackTrace();
 			        } 
-					
 		            
 					System.out.printf("%d번 게시물이 작성되었습니다.\n", lastArticleId);
 				} else if (cmd.equals("article list")) {
