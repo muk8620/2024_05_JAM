@@ -2,9 +2,8 @@ package com.koreaIT.JAM;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,13 +32,84 @@ public class App {
 				System.out.printf("명령어) ");
 				String cmd = sc.nextLine().trim();
 				
-				if (cmd.equals("article write")) {
+				if (cmd.equals("member join")) {
+					String loginId = null;
+					String loginPw = null;
+					String name = null;
+					System.out.println("== 회원가입 ==");
+					
+					while (true) {
+						System.out.printf("아이디 : ");
+						loginId = sc.nextLine().trim();
+						
+						if (loginId.isEmpty()) {
+							System.out.println("아이디는 필수 입력공간입니다.");
+							continue;
+						}
+						
+						SecSql sql = new SecSql();
+			        	sql.append("SELECT COUNT(id) > 0");
+			        	sql.append("FROM `member`");
+			        	sql.append("WHERE loginId = ?;", loginId);
+			        	
+			        	boolean isLoginIdDup = DBUtil.selectRowBooleanValue(connection, sql);
+			        	
+			        	if (isLoginIdDup) {
+			        		System.out.printf("%s은(는) 이미 존재하는 아이디 입니다.\n", loginId);
+			        		continue;
+			        	}
+			        	
+						break;
+					}
+					
+					while (true) {
+						System.out.printf("비밀번호 : ");
+						loginPw = sc.nextLine().trim();
+						
+						if (loginPw.isEmpty()) {
+							System.out.println("비밀번호는 필수 입력공간입니다.");
+							continue;
+						}
+						
+						System.out.printf("비밀번호 확인 : ");
+						String loginPwChk = sc.nextLine().trim();
+						
+						if (!loginPw.equals(loginPwChk)) {
+							System.out.println("비밀번호가 일치하지 않습니다.");
+							continue;
+						}
+						break;
+					}
+					
+					while (true) {
+						System.out.printf("이름 : ");
+						name = sc.nextLine().trim();
+						
+						if (name.isEmpty()) {
+							System.out.println("아이디는 필수 입력공간입니다.");
+							continue;
+						}
+						break;
+					}
+					
+					SecSql sql = new SecSql();
+		        	sql.append("INSERT INTO `member`");
+		        	sql.append("SET regDate = NOW()");
+		        	sql.append(", updateDate = NOW()");
+		        	sql.append(", loginId = ?", loginId);
+		        	sql.append(", loginPw = ?", loginPw);
+		        	sql.append(", `name` = ?", name);
+		        	DBUtil.insert(connection, sql);
+		        	
+		        	System.out.printf("%s회원님의 가입을 환영합니다.\n", name);
+					
+				} else if (cmd.equals("article write")) {
 					System.out.println("== 게시물 작성 ==");
 					
 					System.out.printf("제목 : ");
-					String title = sc.nextLine();
+					String title = sc.nextLine().trim();
 					System.out.printf("내용 : ");
-					String body = sc.nextLine();
+					String body = sc.nextLine().trim();
 					
 					SecSql sql = new SecSql();
 		        	sql.append("INSERT INTO article");
@@ -74,7 +144,7 @@ public class App {
 					System.out.println("번호	|		제목		|		작성일		");
 					
 					for (Article article : articles) {
-						System.out.printf("%d	|		%s		|	%s\n", article.id, article.title, article.regDate);
+						System.out.printf("%d	|		%s		|	%s\n", article.id, article.title, article.regDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
 					}
 					
 				} else if (cmd.startsWith("article detail ")) {
@@ -102,8 +172,8 @@ public class App {
 		        	
 					System.out.println("== 게시물 상세보기 ==");
 		        	System.out.println("번호 :" + article.id);
-		        	System.out.println("작성일 :" + article.regDate);
-		        	System.out.println("수정일 :" + article.updateDate);
+		        	System.out.println("작성일 :" + article.regDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
+		        	System.out.println("수정일 :" + article.updateDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
 		        	System.out.println("제목 :" + article.title);
 		        	System.out.println("내용 :" + article.body);
 					
@@ -131,9 +201,9 @@ public class App {
 					System.out.println("== 게시물 수정 ==");
 					
 					System.out.printf("수정 할 제목 : ");
-					String title = sc.nextLine();
+					String title = sc.nextLine().trim();
 					System.out.printf("수정 할 내용 : ");
-					String body = sc.nextLine();
+					String body = sc.nextLine().trim();
 		            
 					sql = new SecSql();
 		        	sql.append("UPDATE article");
