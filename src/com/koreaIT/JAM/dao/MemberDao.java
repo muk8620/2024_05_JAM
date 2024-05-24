@@ -23,7 +23,7 @@ public class MemberDao {
     	return DBUtil.selectRowBooleanValue(conn, sql);
 	}
 
-	public void joinMember(String loginId, String loginPw, String name) {
+	public void doJoin(String loginId, String loginPw, String name) {
 		SecSql sql = new SecSql();
     	sql.append("INSERT INTO `member`");
     	sql.append("SET regDate = NOW()");

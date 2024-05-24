@@ -16,8 +16,8 @@ public class MemberService {
 		return memberDao.isLoginIdDupChk(loginId);
 	}
 
-	public void joinMember(String loginId, String loginPw, String name) {
-		memberDao.joinMember(loginId, loginPw, name);
+	public void doJoin(String loginId, String loginPw, String name) {
+		memberDao.doJoin(loginId, loginPw, name);
 	}
 
 }

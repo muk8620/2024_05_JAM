@@ -17,7 +17,7 @@ public class ArticleDao {
 		this.connection = connection;
 	}
 
-	public int writeArticle(String title, String body) {
+	public int doWrite(String title, String body) {
 		SecSql sql = new SecSql();
     	sql.append("INSERT INTO article");
     	sql.append("SET regDate = NOW()");
@@ -28,39 +28,34 @@ public class ArticleDao {
     	return DBUtil.insert(connection, sql);
 	}
 
-	public List<Article> showArticleList() {
-		List<Article> articles = new ArrayList<>();
+	public List<Map<String, Object>> showList() {
 		SecSql sql = new SecSql();
-    	sql.append("SELECT * FROM article");
+    	sql.append("SELECT *");
+    	sql.append("FROM article");
     	sql.append("ORDER BY id DESC;");
     	
-    	List<Map<String, Object>> articleListMap = DBUtil.selectRows(connection, sql);
-    	
-    	for (Map<String, Object> articleMap : articleListMap) {
-    		articles.add(new Article(articleMap));
-    	}
-    	
-    	return articles;
+    	return DBUtil.selectRows(connection, sql);
 	}
 
-	public Map<String, Object> getArticleById(int id) {
+	public Map<String, Object> showDetail(int id) {
 		SecSql sql = new SecSql();
-		sql.append("SELECT * FROM article");
-    	sql.append("WHERE id = ?;", id);
+		sql.append("SELECT *");
+		sql.append("FROM article");
+		sql.append("WHERE id = ?", id);
     	
     	return DBUtil.selectRow(connection, sql);
 	}
 
-	public int isArticleExist(int id) {
-		
+	public int getArticleCount(int id) {
 		SecSql sql = new SecSql();
-    	sql.append("SELECT COUNT(id) FROM article");
-    	sql.append("WHERE id = ?;", id);
+		sql.append("SELECT *");
+		sql.append("FROM article");
+		sql.append("WHERE id = ?", id);
     	
     	return DBUtil.selectRowIntValue(connection, sql);
 	}
 
-	public void modifyArticle(int id, String title, String body) {
+	public void doModify(int id, String title, String body) {
 		SecSql sql = new SecSql();
     	sql.append("UPDATE article");
     	sql.append("SET updateDate = NOW()");
@@ -71,10 +66,10 @@ public class ArticleDao {
     	DBUtil.update(connection, sql);
 	}
 
-	public void deleteArticle(int id) {
+	public void doDelete(int id) {
 		SecSql sql = new SecSql();
-    	sql.append("DELETE from article");
-    	sql.append("WHERE id = ?", id);
+		sql.append("DELETE FROM article");
+		sql.append("WHERE id = ?", id);
 		
     	DBUtil.delete(connection, sql);
 	}

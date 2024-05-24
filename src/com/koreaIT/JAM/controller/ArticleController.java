@@ -27,13 +27,13 @@ public class ArticleController {
 		System.out.printf("내용 : ");
 		String body = sc.nextLine().trim();
     	
-    	int id = articleService.writeArticle(title, body);
+    	int id = articleService.doWrite(title, body);
         
 		System.out.printf("%d번 게시물이 작성되었습니다.\n", id);
 	}
 	
 	public void showList() {
-		List<Article> foundArticles = articleService.showArticleList();
+		List<Article> foundArticles = articleService.showList();
 		
 		if (foundArticles.size() == 0) {
 			System.out.println("게시물이 존재하지 않습니다.");
@@ -49,24 +49,19 @@ public class ArticleController {
 	}
 
 	public void showDetail(String cmd) {
+		int id = articleService.getCmdNum(cmd);
 		
-		int id = 0;
-		
-		try {
-			id = Integer.parseInt(cmd.split(" ")[2]); 
-		} catch (NumberFormatException e) {
-			System.out.println("명령어가 올바르지 않습니다.");
+		if (id == -1) {
+			System.out.println("게시물 번호를 잘못 입력하셨습니다.");
 			return;
-		} 
+		}
 		
-		Map<String, Object> articleMap = articleService.getArticleById(id);
+		Article article = articleService.showDetail(id);
 		
-    	if (articleMap.isEmpty()) {
+    	if (article == null) {
     		System.out.printf("%d번 게시물은 존재하지 않습니다.", id);
     		return;
     	}
-    	
-    	Article article = new Article(articleMap);
     	
 		System.out.println("== 게시물 상세보기 ==");
     	System.out.println("번호 :" + article.id);
@@ -78,16 +73,14 @@ public class ArticleController {
 	}
 
 	public void doModify(String cmd) {
-		int id = 0;
+		int id = articleService.getCmdNum(cmd);
 		
-		try {
-			id = Integer.parseInt(cmd.split(" ")[2]); 
-		} catch (NumberFormatException e) {
-			System.out.println("명령어가 올바르지 않습니다.");
+		if (id == -1) {
+			System.out.println("게시물 번호를 잘못 입력하셨습니다.");
 			return;
-		} 
+		}
 		
-		int articleCount = articleService.isArticleExist(id);
+		int articleCount = articleService.getArticleCount(id);
     	
     	if (articleCount == 0) {
     		System.out.printf("%d번 게시물은 존재하지 않습니다.", id);
@@ -101,33 +94,31 @@ public class ArticleController {
 		System.out.printf("수정 할 내용 : ");
 		String body = sc.nextLine().trim();
         
-		articleService.modifyArticle(id, title, body);
+		articleService.doModify(id, title, body);
 		
 		System.out.printf("%d번 게시물이 수정되었습니다.\n", id);
 		
 	}
 
 	public void doDelete(String cmd) {
-		int id = 0;
+		int id = articleService.getCmdNum(cmd);
 		
-		try {
-			id = Integer.parseInt(cmd.split(" ")[2]); 
-		} catch (NumberFormatException e) {
-			System.out.println("명령어가 올바르지 않습니다.");
+		if (id == -1) {
+			System.out.println("게시물 번호를 잘못 입력하셨습니다.");
 			return;
-		} 
+		}
 		
-		int articleCount = articleService.isArticleExist(id);
+		int articleCount = articleService.getArticleCount(id);
     	
     	if (articleCount == 0) {
     		System.out.printf("%d번 게시물은 존재하지 않습니다.", id);
     		return;
     	}
 		
-    	articleService.deleteArticle(id);
+    	System.out.println("== 게시물 삭제 ==");
     	
-		System.out.println("== 게시물 삭제 ==");
-		
+    	articleService.doDelete(id);
+    	
 		System.out.printf("%d번 게시물이 삭제되었습니다.\n", id);
 		
 	}

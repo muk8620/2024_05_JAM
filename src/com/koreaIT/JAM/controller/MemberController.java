@@ -26,7 +26,7 @@ public class MemberController {
 			loginId = sc.nextLine().trim();
 			
 			if (loginId.isEmpty()) {
-				System.out.println("아이디는 필수 입력공간입니다.");
+				System.out.println("아이디는 필수 입력 정보입니다");
 				continue;
 			}
 			
@@ -36,7 +36,7 @@ public class MemberController {
         		System.out.printf("%s은(는) 이미 존재하는 아이디 입니다.\n", loginId);
         		continue;
         	}
-        	
+        	System.out.printf("[ %s ] 은(는) 사용가능한 아이디입니다\n", loginId);
 			break;
 		}
 		
@@ -45,7 +45,7 @@ public class MemberController {
 			loginPw = sc.nextLine().trim();
 			
 			if (loginPw.isEmpty()) {
-				System.out.println("비밀번호는 필수 입력공간입니다.");
+				System.out.println("비밀번호는 필수 입력 정보입니다");
 				continue;
 			}
 			
@@ -64,13 +64,13 @@ public class MemberController {
 			name = sc.nextLine().trim();
 			
 			if (name.isEmpty()) {
-				System.out.println("아이디는 필수 입력공간입니다.");
+				System.out.println("이름은 필수 입력 정보입니다");
 				continue;
 			}
 			break;
 		}
     	
-    	memberService.joinMember(loginId, loginPw, name);
+    	memberService.doJoin(loginId, loginPw, name);
     	
     	System.out.printf("%s회원님의 가입을 환영합니다.\n", name);
 	}

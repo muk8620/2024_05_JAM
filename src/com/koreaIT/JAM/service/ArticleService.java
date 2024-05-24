@@ -1,6 +1,7 @@
 package com.koreaIT.JAM.service;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,31 +13,57 @@ public class ArticleService {
 	private ArticleDao articleDao;
 	
 	public ArticleService(Connection connection) {
-		articleDao = new ArticleDao(connection);
+		this.articleDao = new ArticleDao(connection);
 	}
 
-	public int writeArticle(String title, String body) {
-		return articleDao.writeArticle(title, body);
+	public int doWrite(String title, String body) {
+		return articleDao.doWrite(title, body);
 	}
 
-	public List<Article> showArticleList() {
-		return articleDao.showArticleList();
+	public List<Article> showList() {
+		List<Map<String, Object>> articleListMap = articleDao.showList();
+		
+		List<Article> articles = new ArrayList<>();
+		
+		for (Map<String, Object> articleMap : articleListMap) {
+    		articles.add(new Article(articleMap));
+    	}
+		
+		return articles;
 	}
 
-	public Map<String, Object> getArticleById(int id) {
-		return articleDao.getArticleById(id);
+	public Article showDetail(int id) {
+		Map<String, Object> articleMap = articleDao.showDetail(id);
+		
+		if (articleMap.isEmpty()) {
+			return null;
+		}
+		
+		return new Article(articleMap);
 	}
 
-	public int isArticleExist(int id) {
-		return articleDao.isArticleExist(id);
+	public int getArticleCount(int id) {
+		return articleDao.getArticleCount(id);
 	}
 
-	public void modifyArticle(int id, String title, String body) {
-		articleDao.modifyArticle(id, title, body);
+	public void doModify(int id, String title, String body) {
+		articleDao.doModify(id, title, body);
 	}
 
-	public void deleteArticle(int id) {
-		articleDao.deleteArticle(id);
+	public void doDelete(int id) {
+		articleDao.doDelete(id);
+	}
+
+	public int getCmdNum(String cmd) {
+		int id = -1;
+		
+		try {
+			id = Integer.parseInt(cmd.split(" ")[2]); 
+		} catch (NumberFormatException e) {
+			return -1;
+		} 
+		
+		return id;
 	}
 
 }
