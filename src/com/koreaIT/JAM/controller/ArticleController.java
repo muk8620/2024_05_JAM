@@ -1,13 +1,12 @@
 package com.koreaIT.JAM.controller;
 
 import java.sql.Connection;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import com.koreaIT.JAM.dto.Article;
 import com.koreaIT.JAM.service.ArticleService;
+import com.koreaIT.JAM.session.Session;
 
 public class ArticleController {
 
@@ -20,6 +19,12 @@ public class ArticleController {
 	}
 	
 	public void doWrite() {
+		
+		if (Session.isLogined() == false) {
+			System.out.println("로그인 후 이용해주세요");
+			return;
+		}
+		
 		System.out.println("== 게시물 작성 ==");
 		
 		System.out.printf("제목 : ");
@@ -27,7 +32,7 @@ public class ArticleController {
 		System.out.printf("내용 : ");
 		String body = sc.nextLine().trim();
     	
-    	int id = articleService.doWrite(title, body);
+    	int id = articleService.doWrite(Session.getLoginedMemberId(), title, body);
         
 		System.out.printf("%d번 게시물이 작성되었습니다.\n", id);
 	}
@@ -41,10 +46,10 @@ public class ArticleController {
 		}
 		
 		System.out.println("== 게시물 목록 ==");
-		System.out.println("번호	|		제목		|		작성일		");
+		System.out.println("번호	|		제목		|	작성자	|		작성일");
 		
 		for (Article article : foundArticles) {
-			System.out.printf("%d	|		%s		|	%s\n", article.id, article.title, article.regDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
+			System.out.printf("%d	|		%s		|	%s	|	%s\n", article.id, article.title, article.writerName, article.regDate);
 		}
 	}
 
@@ -59,20 +64,26 @@ public class ArticleController {
 		Article article = articleService.showDetail(id);
 		
     	if (article == null) {
-    		System.out.printf("%d번 게시물은 존재하지 않습니다.", id);
+    		System.out.printf("%d번 게시물은 존재하지 않습니다.\n", id);
     		return;
     	}
     	
 		System.out.println("== 게시물 상세보기 ==");
     	System.out.println("번호 :" + article.id);
-    	System.out.println("작성일 :" + article.regDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
-    	System.out.println("수정일 :" + article.updateDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
+    	System.out.println("작성자 :" + article.writerName);
+    	System.out.println("작성일 :" + article.regDate);
+    	System.out.println("수정일 :" + article.updateDate);
     	System.out.println("제목 :" + article.title);
     	System.out.println("내용 :" + article.body);
 		
 	}
 
 	public void doModify(String cmd) {
+		if (Session.isLogined() == false) {
+			System.out.println("로그인 후 이용해주세요");
+			return;
+		}
+		
 		int id = articleService.getCmdNum(cmd);
 		
 		if (id == -1) {
@@ -80,20 +91,25 @@ public class ArticleController {
 			return;
 		}
 		
-		int articleCount = articleService.getArticleCount(id);
-    	
-    	if (articleCount == 0) {
-    		System.out.printf("%d번 게시물은 존재하지 않습니다.", id);
-    		return;
-    	}
+		Article article = articleService.getArticleById(id);
 		
+		if (article == null) {
+			System.out.printf("%d번 게시물은 존재하지 않습니다\n", id);
+			return;
+		}
+		
+		if (article.memberId != Session.getLoginedMemberId()) {
+			System.out.println("해당 게시물에 대한 권한이 없습니다");
+			return;
+		}
+    	
 		System.out.println("== 게시물 수정 ==");
 		
 		System.out.printf("수정 할 제목 : ");
 		String title = sc.nextLine().trim();
 		System.out.printf("수정 할 내용 : ");
 		String body = sc.nextLine().trim();
-        
+		
 		articleService.doModify(id, title, body);
 		
 		System.out.printf("%d번 게시물이 수정되었습니다.\n", id);
@@ -101,6 +117,11 @@ public class ArticleController {
 	}
 
 	public void doDelete(String cmd) {
+		if (Session.isLogined() == false) {
+			System.out.println("로그인 후 이용해주세요");
+			return;
+		}
+		
 		int id = articleService.getCmdNum(cmd);
 		
 		if (id == -1) {
@@ -108,12 +129,17 @@ public class ArticleController {
 			return;
 		}
 		
-		int articleCount = articleService.getArticleCount(id);
-    	
-    	if (articleCount == 0) {
-    		System.out.printf("%d번 게시물은 존재하지 않습니다.", id);
-    		return;
-    	}
+		Article article = articleService.getArticleById(id);
+		
+		if (article == null) {
+			System.out.printf("%d번 게시물은 존재하지 않습니다\n", id);
+			return;
+		}
+		
+		if (article.memberId != Session.getLoginedMemberId()) {
+			System.out.println("해당 게시물에 대한 권한이 없습니다");
+			return;
+		}
 		
     	System.out.println("== 게시물 삭제 ==");
     	

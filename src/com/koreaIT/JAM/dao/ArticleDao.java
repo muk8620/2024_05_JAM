@@ -1,11 +1,9 @@
 package com.koreaIT.JAM.dao;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.koreaIT.JAM.dto.Article;
 import com.koreaIT.JAM.util.DBUtil;
 import com.koreaIT.JAM.util.SecSql;
 
@@ -17,11 +15,12 @@ public class ArticleDao {
 		this.connection = connection;
 	}
 
-	public int doWrite(String title, String body) {
+	public int doWrite(int memberId, String title, String body) {
 		SecSql sql = new SecSql();
     	sql.append("INSERT INTO article");
     	sql.append("SET regDate = NOW()");
     	sql.append(", updateDate = NOW()");
+    	sql.append(", memberId = ?", memberId);
     	sql.append(", title = ?", title);
     	sql.append(", `body` = ?", body);
     	
@@ -30,25 +29,29 @@ public class ArticleDao {
 
 	public List<Map<String, Object>> showList() {
 		SecSql sql = new SecSql();
-    	sql.append("SELECT *");
-    	sql.append("FROM article");
-    	sql.append("ORDER BY id DESC;");
+		sql.append("SELECT a.*, m.loginId `writerName`");
+    	sql.append("FROM article a");
+    	sql.append("JOIN `member` m");
+    	sql.append("ON a.memberId = m.id");
+    	sql.append("ORDER BY a.id DESC");
     	
     	return DBUtil.selectRows(connection, sql);
 	}
 
 	public Map<String, Object> showDetail(int id) {
 		SecSql sql = new SecSql();
-		sql.append("SELECT *");
-		sql.append("FROM article");
-		sql.append("WHERE id = ?", id);
+		sql.append("SELECT a.*, m.loginId `writerName`");
+    	sql.append("FROM article a");
+    	sql.append("JOIN `member` m");
+    	sql.append("ON a.memberId = m.id");
+		sql.append("WHERE a.id = ?", id);
     	
     	return DBUtil.selectRow(connection, sql);
 	}
 
 	public int getArticleCount(int id) {
 		SecSql sql = new SecSql();
-		sql.append("SELECT *");
+		sql.append("SELECT COUNT(id)");
 		sql.append("FROM article");
 		sql.append("WHERE id = ?", id);
     	
@@ -73,5 +76,15 @@ public class ArticleDao {
 		
     	DBUtil.delete(connection, sql);
 	}
+	
+	public Map<String, Object> getArticleById(int id) {
+	
+		SecSql sql = new SecSql();
+		sql.append("SELECT * FROM article");
+		sql.append("WHERE id = ?", id);
+		
+		return DBUtil.selectRow(connection, sql);
+	}
+
 	
 }
