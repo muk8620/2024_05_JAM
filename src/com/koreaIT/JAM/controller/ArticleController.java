@@ -7,6 +7,7 @@ import java.util.Scanner;
 import com.koreaIT.JAM.dto.Article;
 import com.koreaIT.JAM.service.ArticleService;
 import com.koreaIT.JAM.session.Session;
+import com.koreaIT.JAM.util.Util;
 
 public class ArticleController {
 
@@ -46,10 +47,10 @@ public class ArticleController {
 		}
 		
 		System.out.println("== 게시물 목록 ==");
-		System.out.println("번호	|		제목		|	작성자	|		작성일");
+		System.out.println("번호	|		제목		|	작성자	|		작성일		|	조회수");
 		
 		for (Article article : foundArticles) {
-			System.out.printf("%d	|		%s		|	%s	|	%s\n", article.id, article.title, article.writerName, article.regDate);
+			System.out.printf("%d	|		%s		|	%s	|	%s	|	%s\n", article.id, article.title, article.writerName, Util.datetimeFormat(article.regDate), article.vCnt);
 		}
 	}
 
@@ -61,20 +62,23 @@ public class ArticleController {
 			return;
 		}
 		
-		Article article = articleService.showDetail(id);
+		int affectedRow = articleService.increaseVCnt(id);
 		
-    	if (article == null) {
+    	if (affectedRow == 0) {
     		System.out.printf("%d번 게시물은 존재하지 않습니다.\n", id);
     		return;
     	}
     	
+    	Article article = articleService.showDetail(id);
+    	
 		System.out.println("== 게시물 상세보기 ==");
     	System.out.println("번호 :" + article.id);
     	System.out.println("작성자 :" + article.writerName);
-    	System.out.println("작성일 :" + article.regDate);
-    	System.out.println("수정일 :" + article.updateDate);
+    	System.out.println("작성일 :" + Util.datetimeFormat(article.regDate));
+    	System.out.println("작성일 :" + Util.datetimeFormat(article.updateDate));
     	System.out.println("제목 :" + article.title);
     	System.out.println("내용 :" + article.body);
+    	System.out.println("조회수 :" + article.vCnt);
 		
 	}
 
