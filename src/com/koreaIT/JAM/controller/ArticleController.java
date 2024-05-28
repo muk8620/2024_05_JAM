@@ -38,8 +38,19 @@ public class ArticleController {
 		System.out.printf("%d번 게시물이 작성되었습니다.\n", id);
 	}
 	
-	public void showList() {
-		List<Article> foundArticles = articleService.showList();
+	public void showList(String cmd) {
+		
+		String searchKeyword = cmd.substring("article list".length()).trim();
+		
+		List<Article> foundArticles = articleService.showList(searchKeyword);
+		
+		if (searchKeyword.length() > 0) {
+			System.out.println("검색어 : " + searchKeyword);
+			if (foundArticles.size() == 0) {
+				System.out.println("검색결과가 존재하지 않습니다.");
+				return;
+			}
+		}
 		
 		if (foundArticles.size() == 0) {
 			System.out.println("게시물이 존재하지 않습니다.");
